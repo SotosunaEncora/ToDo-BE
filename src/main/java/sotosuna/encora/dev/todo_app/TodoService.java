@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -14,6 +15,15 @@ import java.util.stream.Collectors;
 @Service
 public class TodoService {
     private final TodoRepository todoRepository;
+
+    private int priorityOrder(String priority) {
+        return switch (priority.toLowerCase()) {
+            case "high" -> 1;
+            case "medium" -> 2;
+            case "low" -> 3;
+            default -> 4;
+        };
+    }
 
     @Autowired
     public TodoService(TodoRepository todoRepository) {
@@ -27,6 +37,8 @@ public class TodoService {
                 .filter(todo -> (status == null || status.isEmpty() ||
                         (status.equalsIgnoreCase("done") && todo.isCompleted()) ||
                         (status.equalsIgnoreCase("not_done") && !todo.isCompleted())))
+                .sorted(Comparator.comparing((Todo todo) -> priorityOrder(todo.getPriority()))
+                        .thenComparing(Todo::getDueDate))
                 .collect(Collectors.toList());
     }
 

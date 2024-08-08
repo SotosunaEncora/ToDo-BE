@@ -1,3 +1,4 @@
+
 package sotosuna.encora.dev.todo_app.config;
 
 import org.springframework.context.annotation.Bean;

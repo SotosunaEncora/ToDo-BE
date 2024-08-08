@@ -23,8 +23,10 @@ public class TodoController {
     public List<Todo> getAllTodos(
         @RequestParam(required = false) String text,
         @RequestParam(required = false) String priority,
-        @RequestParam(required = false) String status) {
-        return todoService.getFilteredTodos(text, priority, status);
+        @RequestParam(required = false) String status,
+        @RequestParam(required = false) boolean ascendingPriority,
+        @RequestParam(required = false) boolean ascendingDueDate) {
+        return todoService.getFilteredTodos(text, priority, status, ascendingPriority, ascendingDueDate);
     }
 
 

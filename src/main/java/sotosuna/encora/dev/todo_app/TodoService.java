@@ -30,16 +30,30 @@ public class TodoService {
         this.todoRepository = todoRepository;
     }
 
-    public List<Todo> getFilteredTodos(String text, String priority, String status) {
+    public List<Todo> getFilteredTodos(String text, String priority, String status, boolean ascendingPriority, boolean ascendingDueDate) {
         return todoRepository.findAll().stream()
                 .filter(todo -> (text == null || text.isEmpty() || todo.getText().toLowerCase().contains(text.toLowerCase())))
                 .filter(todo -> (priority == null || priority.isEmpty() || todo.getPriority().equalsIgnoreCase(priority)))
                 .filter(todo -> (status == null || status.isEmpty() ||
                         (status.equalsIgnoreCase("done") && todo.isCompleted()) ||
                         (status.equalsIgnoreCase("not_done") && !todo.isCompleted())))
-                .sorted(Comparator.comparing((Todo todo) -> priorityOrder(todo.getPriority()))
-                        .thenComparing(Todo::getDueDate))
+                .sorted(getComparator(ascendingPriority, ascendingDueDate))
                 .collect(Collectors.toList());
+    }
+
+    private Comparator<Todo> getComparator(boolean ascendingPriority, boolean ascendingDueDate) {
+        Comparator<Todo> priorityComparator = Comparator.comparing((Todo todo) -> priorityOrder(todo.getPriority()));
+        Comparator<Todo> dueDateComparator = Comparator.comparing(Todo::getDueDate);
+
+        if (ascendingPriority) {
+            priorityComparator = priorityComparator.reversed();
+        }
+
+        if (ascendingDueDate) {
+            dueDateComparator = dueDateComparator.reversed();
+        }
+
+        return priorityComparator.thenComparing(dueDateComparator);
     }
 
     public List<Todo> getAllTodos() {
